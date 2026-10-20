@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Analiza Algoritmilor - Antrenament Parțial</title>
+  <link rel="stylesheet" href="style.css">
+
+  <!-- KaTeX for math rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+</head>
+<body>
+
+  <!-- Drawer Backdrop -->
+  <div id="drawer-backdrop" class="drawer-backdrop" style="display: none;"></div>
+
+  <!-- Topic Navigation Drawer -->
+  <aside id="topic-drawer" class="topic-drawer" aria-hidden="true">
+    <div class="drawer-header">
+      <div class="drawer-title-area">
+        <h2 class="drawer-title">Meniu Întrebări</h2>
+        <p class="drawer-subtitle">Selectează și exersează orice întrebare din examen</p>
+      </div>
+      <button id="btn-close-drawer" class="btn-close" aria-label="Închide meniul">&times;</button>
+    </div>
+
+    <!-- Search Input inside Drawer -->
+    <div class="drawer-search-container">
+      <div class="search-input-wrapper">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="drawer-search-input" class="drawer-search-input" placeholder="Caută întrebare, topic sau cuvânt-cheie (ex: Master, BTree)..." autocomplete="off">
+        <button id="btn-clear-search" class="btn-clear-search" style="display: none;" aria-label="Șterge căutarea">&times;</button>
+      </div>
+    </div>
+
+    <!-- Mode Selector & Stats Bar -->
+    <div class="drawer-stats-bar">
+      <div class="drawer-mode-tabs">
+        <button id="tab-mode-topics" class="drawer-tab-btn active" data-mode="topics">📂 Pe Topici</button>
+        <button id="tab-mode-all" class="drawer-tab-btn" data-mode="all_list">📜 Listă (1 - 30)</button>
+      </div>
+      <div class="drawer-actions-right">
+        <span id="drawer-stats-text">30 întrebări</span>
+        <button id="btn-toggle-accordions" class="btn-text-action">Restrânge toate</button>
+      </div>
+    </div>
+
+    <!-- Category Groups / Question List Container -->
+    <div class="drawer-content" id="drawer-content">
+      <!-- Generat dinamic de app.js cu expansiune completă și scroll dedicat -->
+    </div>
+  </aside>
+
+  <!-- Main Quiz App -->
+  <main class="quiz-container">
+    <header class="header">
+      <h1>Analiza Algoritmilor</h1>
+      <p class="subtitle">Pregătire Parțial - Variantele A, B, C, D (Grile &amp; Răspuns Liber)</p>
+      
+      <!-- Top Action Bar: Menu button & Filters -->
+      <div class="top-nav-bar">
+        <button id="btn-open-menu" class="btn btn-menu" title="Deschide meniul complet cu întrebări">
+          <span class="menu-icon">☰</span>
+          <span class="menu-text">Meniu Întrebări (pe Topici)</span>
+          <span class="menu-badge" id="menu-total-badge">30</span>
+        </button>
+
+        <!-- Filter Tabs / Mode Selection -->
+        <div class="filter-bar">
+          <button class="filter-btn active" data-filter="all">Toate (<span id="count-all">30</span>)</button>
+          <button class="filter-btn" data-filter="multiple_choice">Grile (<span id="count-mc">18</span>)</button>
+          <button class="filter-btn" data-filter="open_ended">Răspuns Liber (<span id="count-oe">12</span>)</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Question Card -->
+    <section class="card" id="quiz-card">
+      <!-- Quick Navigation Header on Card -->
+      <div class="card-top-nav">
+        <button id="btn-prev-q" class="btn-nav" title="Întrebarea anterioară">&larr; Înapoi</button>
+        <button id="btn-quick-menu" class="btn-nav btn-nav-center" title="Deschide meniul de întrebări">
+          <span id="quick-current-label">Întrebarea 1 din 30</span>
+          <span class="dropdown-arrow">▾</span>
+        </button>
+        <button id="btn-next-q" class="btn-nav" title="Întrebarea următoare">Înainte &rarr;</button>
+      </div>
+
+      <div class="card-meta">
+        <span class="category-tag" id="category-tag">Categorie</span>
+        <span class="topic-tag" id="topic-tag">Topic</span>
+        <span class="source-tag" id="source-tag">Sursă</span>
+        <span class="type-badge" id="type-badge">Grilă</span>
+      </div>
+
+      <h2 class="question-title" id="question-text">Se încarcă întrebarea...</h2>
+
+      <!-- Code Snippet Area (hidden if question has no code) -->
+      <pre class="code-block" id="code-block" style="display: none;"><code id="code-content"></code></pre>
+
+      <!-- Multiple Choice Options Area -->
+      <div class="options-container" id="options-container">
+        <!-- Generat dinamic pentru întrebările tip grilă -->
+      </div>
+
+      <!-- Open Ended (Free Response) Area -->
+      <div class="open-ended-container" id="open-ended-container" style="display: none;">
+        <label for="student-answer-input" class="open-ended-label">
+          <strong>Răspunsul tău:</strong>
+          <span class="open-ended-hint">Scrie rezolvarea ta mai jos, apoi apasă pe „Compară cu Soluția din PDF”.</span>
+        </label>
+        <textarea id="student-answer-input" class="student-textarea" placeholder="Scrie aici răspunsul sau raționamentul tău..."></textarea>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="btn-group">
+        <button id="btn-check" class="btn btn-primary" disabled>Verifică Răspunsul</button>
+        <button id="btn-reveal" class="btn btn-secondary">Arată Răspunsul Oficial</button>
+        <button id="btn-next" class="btn btn-outline" style="display: none;">Următoarea Întrebare &rarr;</button>
+      </div>
+
+      <!-- Explanation & Result Box (hidden until requested) -->
+      <div class="explanation-box" id="explanation-box" style="display: none;">
+        <h3 id="result-title"></h3>
+        
+        <!-- Comparison section for open ended questions -->
+        <div id="comparison-view" class="comparison-view" style="display: none;">
+          <div class="comparison-column user-col">
+            <div class="comparison-header">Răspunsul Tău:</div>
+            <div class="comparison-content" id="student-answer-display"></div>
+          </div>
+          <div class="comparison-column solution-col">
+            <div class="comparison-header">Răspuns Oficial (din PDF):</div>
+            <div class="comparison-content" id="official-answer-display"></div>
+          </div>
+        </div>
+
+        <!-- Self-evaluation prompt for open-ended -->
+        <div id="self-eval-box" class="self-eval-box" style="display: none;">
+          <p class="self-eval-prompt"><strong>Autoevaluare:</strong> Compară răspunsul tău cu soluția din PDF. Consideri că ai răspuns corect?</p>
+          <div class="self-eval-actions">
+            <button id="btn-eval-correct" class="btn btn-success-sm">✓ Am răspuns corect</button>
+            <button id="btn-eval-partial" class="btn btn-warning-sm">~ Parțial corect</button>
+            <button id="btn-eval-wrong" class="btn btn-danger-sm">✗ Am greșit</button>
+          </div>
+        </div>
+
+        <div class="explanation-content" id="explanation-text"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Load data first, then app logic -->
+  <script src="questions.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
