@@ -39,11 +39,11 @@
     <div class="drawer-stats-bar">
       <div class="drawer-mode-tabs">
         <button id="tab-mode-topics" class="drawer-tab-btn active" data-mode="topics">📂 Pe Topici</button>
-        <button id="tab-mode-all" class="drawer-tab-btn" data-mode="all_list">📜 Listă (1 - 30)</button>
+        <button id="tab-mode-all" class="drawer-tab-btn" data-mode="all_list">📜 Toate Întrebările</button>
       </div>
       <div class="drawer-actions-right">
-        <span id="drawer-stats-text">30 întrebări</span>
-        <button id="btn-toggle-accordions" class="btn-text-action">Restrânge toate</button>
+        <span id="drawer-stats-text">56 de întrebări</span>
+        <button id="btn-toggle-accordions" class="btn-text-action">Extinde toate</button>
       </div>
     </div>
 
@@ -57,21 +57,23 @@
   <main class="quiz-container">
     <header class="header">
       <h1>Analiza Algoritmilor</h1>
-      <p class="subtitle">Pregătire Parțial - Variantele A, B, C, D (Grile &amp; Răspuns Liber)</p>
+      <p class="subtitle">Pregătire Parțial &amp; Examen - Variantele A, B, C, D (Grile &amp; Răspuns Liber)</p>
       
       <!-- Top Action Bar: Menu button & Filters -->
       <div class="top-nav-bar">
         <button id="btn-open-menu" class="btn btn-menu" title="Deschide meniul complet cu întrebări">
           <span class="menu-icon">☰</span>
           <span class="menu-text">Meniu Întrebări (pe Topici)</span>
-          <span class="menu-badge" id="menu-total-badge">30</span>
+          <span class="menu-badge" id="menu-total-badge">56</span>
         </button>
 
         <!-- Filter Tabs / Mode Selection -->
         <div class="filter-bar">
-          <button class="filter-btn active" data-filter="all">Toate (<span id="count-all">30</span>)</button>
-          <button class="filter-btn" data-filter="multiple_choice">Grile (<span id="count-mc">18</span>)</button>
-          <button class="filter-btn" data-filter="open_ended">Răspuns Liber (<span id="count-oe">12</span>)</button>
+          <button class="filter-btn active" data-filter="all">Toate (<span id="count-all">56</span>)</button>
+          <button class="filter-btn" data-filter="partial">Parțial (<span id="count-partial">30</span>)</button>
+          <button class="filter-btn" data-filter="examen">Examen (<span id="count-examen">26</span>)</button>
+          <button class="filter-btn" data-filter="multiple_choice">Grile (<span id="count-mc">34</span>)</button>
+          <button class="filter-btn" data-filter="open_ended">Răspuns Liber (<span id="count-oe">22</span>)</button>
         </div>
       </div>
     </header>
@@ -82,7 +84,7 @@
       <div class="card-top-nav">
         <button id="btn-prev-q" class="btn-nav" title="Întrebarea anterioară">&larr; Înapoi</button>
         <button id="btn-quick-menu" class="btn-nav btn-nav-center" title="Deschide meniul de întrebări">
-          <span id="quick-current-label">Întrebarea 1 din 30</span>
+          <span id="quick-current-label">Întrebarea 1 din 56</span>
           <span class="dropdown-arrow">▾</span>
         </button>
         <button id="btn-next-q" class="btn-nav" title="Întrebarea următoare">Înainte &rarr;</button>

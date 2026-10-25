@@ -10,7 +10,7 @@ const answeredQuestionIds = new Set();
 let isDrawerOpen = false;
 let drawerSearchQuery = "";
 let drawerViewMode = "topics"; // "topics" | "all_list"
-let allCollapsed = false;
+let allCollapsed = true;
 
 // Category Icons Mapping
 const CATEGORY_ICONS = {
@@ -19,7 +19,9 @@ const CATEGORY_ICONS = {
   "Relații de Recurență & Teorema Master": "🔁",
   "Specificare Algebrică & Inducție": "🌳",
   "Structuri de Date": "🗃️",
-  "Analiza Complexității & Algoritmi": "⏱️"
+  "Analiza Complexității & Algoritmi": "⏱️",
+  "Arbori AVL & Structuri Balansate": "🌲",
+  "Complexitate Computațională & NP-Completitudine": "🧩"
 };
 
 // Track collapsed state per category
@@ -55,6 +57,8 @@ const officialAnswerDisplay = document.getElementById("official-answer-display")
 const selfEvalBox = document.getElementById("self-eval-box");
 
 const countAll = document.getElementById("count-all");
+const countPartial = document.getElementById("count-partial");
+const countExamen = document.getElementById("count-examen");
 const countMc = document.getElementById("count-mc");
 const countOe = document.getElementById("count-oe");
 const filterBtns = document.querySelectorAll(".filter-btn");
@@ -77,6 +81,13 @@ const tabModeAll = document.getElementById("tab-mode-all");
 // Initialize App
 // ==========================================
 function init() {
+  // Start with all categories collapsed
+  const categories = getCategoriesList();
+  categories.forEach(cat => collapsedCategories.add(cat));
+  if (btnToggleAccordions) {
+    btnToggleAccordions.textContent = "Extinde toate";
+  }
+
   updateCounts();
   applyFilter("all");
   buildDrawerContent();
@@ -165,7 +176,11 @@ function init() {
 function updateCounts() {
   const mcCount = questions.filter(q => q.type === "multiple_choice").length;
   const oeCount = questions.filter(q => q.type === "open_ended").length;
+  const partialCount = questions.filter(q => q.source && q.source.includes("Parțial")).length;
+  const examenCount = questions.filter(q => q.source && q.source.includes("Examen")).length;
   countAll.textContent = questions.length;
+  if (countPartial) countPartial.textContent = partialCount;
+  if (countExamen) countExamen.textContent = examenCount;
   countMc.textContent = mcCount;
   countOe.textContent = oeCount;
   if (menuTotalBadge) menuTotalBadge.textContent = questions.length;
@@ -179,6 +194,10 @@ function applyFilter(filter) {
 
   if (filter === "all") {
     filteredQuestions = [...questions];
+  } else if (filter === "partial") {
+    filteredQuestions = questions.filter(q => q.source && q.source.includes("Parțial"));
+  } else if (filter === "examen") {
+    filteredQuestions = questions.filter(q => q.source && q.source.includes("Examen"));
   } else {
     filteredQuestions = questions.filter(q => q.type === filter);
   }
@@ -208,7 +227,11 @@ function loadQuestion(index) {
   quickCurrentLabel.textContent = `Q${q.id} • ${index + 1} din ${filteredQuestions.length}`;
   categoryTag.textContent = (CATEGORY_ICONS[q.category] ? CATEGORY_ICONS[q.category] + " " : "") + (q.category || "General");
   topicTag.textContent = q.topic || "Analiza Algoritmilor";
+
+  const isExamen = q.source && q.source.includes("Examen");
+  const isPartial = q.source && q.source.includes("Parțial");
   sourceTag.textContent = q.source || "Examen AA";
+  sourceTag.className = "source-tag" + (isExamen ? " tag-examen" : isPartial ? " tag-partial" : "");
   
   if (q.type === "open_ended") {
     typeBadge.textContent = "Răspuns Liber";
@@ -373,7 +396,9 @@ function getCategoriesList() {
     "Relații de Recurență & Teorema Master",
     "Specificare Algebrică & Inducție",
     "Structuri de Date",
-    "Analiza Complexității & Algoritmi"
+    "Analiza Complexității & Algoritmi",
+    "Arbori AVL & Structuri Balansate",
+    "Complexitate Computațională & NP-Completitudine"
   ];
   const presentCats = Array.from(new Set(questions.map(q => q.category || "General")));
   return presentCats.sort((a, b) => {
@@ -394,12 +419,14 @@ function questionMatchesSearch(q, query) {
   const qTopic = (q.topic || "").toLowerCase();
   const qCategory = (q.category || "").toLowerCase();
   const qCode = (q.code || "").toLowerCase();
+  const qSource = (q.source || "").toLowerCase();
   const qId = `q${q.id}`;
   return qText.includes(query) ||
          qTitle.includes(query) ||
          qTopic.includes(query) ||
          qCategory.includes(query) ||
          qCode.includes(query) ||
+         qSource.includes(query) ||
          qId === query ||
          q.id.toString() === query;
 }
@@ -417,13 +444,17 @@ function createQuestionItemElement(q, currentQ, showCategoryBadge = false) {
   const typeClass = q.type === "open_ended" ? "type-oe" : "type-mc";
   const categoryIcon = CATEGORY_ICONS[q.category] || "📁";
 
+  const isExamen = q.source && q.source.includes("Examen");
+  const isPartial = q.source && q.source.includes("Parțial");
+  const sourceClass = isExamen ? "tag-examen" : isPartial ? "tag-partial" : "";
+
   itemBtn.innerHTML = `
     <div class="q-item-header">
       <div class="q-item-header-left">
         <span class="q-id-pill">#${q.id}</span>
         <span class="q-type-badge ${typeClass}">${typeLabel}</span>
         ${showCategoryBadge ? `<span class="q-cat-pill">${categoryIcon} ${escapeHtml(q.category)}</span>` : ''}
-        <span class="q-source-pill">${escapeHtml(q.source.split('(')[0].trim())}</span>
+        <span class="q-source-pill ${sourceClass}">${escapeHtml(q.source.split('(')[0].trim())}</span>
       </div>
       <div class="q-item-header-right">
         ${isDone ? '<span class="q-status-pill done">✓ Rezolvată</span>' : '<span class="q-status-pill todo">Neîncercată</span>'}
@@ -451,7 +482,7 @@ function buildDrawerContent() {
   const currentQ = getCurrentQuestion();
 
   if (drawerViewMode === "all_list") {
-    // Mode 2: Continuous list (all 30 questions ordered 1 to 30)
+    // Mode 2: Continuous list (all questions ordered 1 to N)
     const matchingQuestions = questions.filter(q => questionMatchesSearch(q, drawerSearchQuery));
 
     if (matchingQuestions.length === 0) {
@@ -461,7 +492,7 @@ function buildDrawerContent() {
 
     drawerStatsText.textContent = drawerSearchQuery 
       ? `${matchingQuestions.length} întrebări găsite`
-      : `${matchingQuestions.length} întrebări (1 - 30)`;
+      : `${matchingQuestions.length} întrebări (1 - ${questions.length})`;
 
     const listContainer = document.createElement("div");
     listContainer.className = "drawer-full-list";
@@ -522,6 +553,20 @@ function buildDrawerContent() {
       } else {
         collapsedCategories.add(catName);
       }
+
+      const allCats = getCategoriesList();
+      const allAreCollapsed = allCats.every(c => collapsedCategories.has(c));
+      const allAreExpanded = collapsedCategories.size === 0;
+      if (allAreCollapsed) {
+        allCollapsed = true;
+        btnToggleAccordions.textContent = "Extinde toate";
+      } else if (allAreExpanded) {
+        allCollapsed = false;
+        btnToggleAccordions.textContent = "Restrânge toate";
+      } else {
+        btnToggleAccordions.textContent = "Extinde toate";
+      }
+
       buildDrawerContent();
     });
 
@@ -603,16 +648,10 @@ function handleToggleOption(index, q) {
   if (isAnswered) return;
 
   const correctList = getCorrectIndices(q);
-  const isMultiSelect = correctList.length > 1;
 
-  if (isMultiSelect) {
-    if (selectedOptionIndices.has(index)) {
-      selectedOptionIndices.delete(index);
-    } else {
-      selectedOptionIndices.add(index);
-    }
+  if (selectedOptionIndices.has(index)) {
+    selectedOptionIndices.delete(index);
   } else {
-    selectedOptionIndices.clear();
     selectedOptionIndices.add(index);
   }
 

@@ -228,6 +228,19 @@ body {
   font-weight: 600;
   padding: 4px 10px;
   border-radius: 20px;
+  border: 1px solid transparent;
+}
+
+.source-tag.tag-partial {
+  background-color: #eff6ff;
+  color: #1e40af;
+  border-color: #bfdbfe;
+}
+
+.source-tag.tag-examen {
+  background-color: #fdf2f8;
+  color: #9d174d;
+  border-color: #fbcfe8;
 }
 
 .type-badge {
@@ -999,6 +1012,20 @@ body {
   padding: 2px 7px;
   border-radius: 6px;
   border: 1px solid #e2e8f0;
+}
+
+.q-source-pill.tag-partial {
+  color: #1e40af;
+  background: #eff6ff;
+  border-color: #bfdbfe;
+  font-weight: 600;
+}
+
+.q-source-pill.tag-examen {
+  color: #9d174d;
+  background: #fdf2f8;
+  border-color: #fbcfe8;
+  font-weight: 600;
 }
 
 .q-item-header-right {
