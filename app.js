@@ -81,9 +81,20 @@ const tabModeAll = document.getElementById("tab-mode-all");
 // Initialize App
 // ==========================================
 function init() {
+  // Clear any search input value that Chrome might restore across reloads
+  if (drawerSearchInput) {
+    drawerSearchInput.value = "";
+  }
+  drawerSearchQuery = "";
+  if (btnClearSearch) {
+    btnClearSearch.style.display = "none";
+  }
+
   // Start with all categories collapsed
+  collapsedCategories.clear();
   const categories = getCategoriesList();
   categories.forEach(cat => collapsedCategories.add(cat));
+  allCollapsed = true;
   if (btnToggleAccordions) {
     btnToggleAccordions.textContent = "Extinde toate";
   }
@@ -878,4 +889,8 @@ function renderMath() {
 }
 
 // Start app when DOM is ready
-document.addEventListener("DOMContentLoaded", init);
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", init);
+} else {
+  init();
+}

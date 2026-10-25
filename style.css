@@ -914,6 +914,11 @@ body {
   background: #ffffff;
 }
 
+/* Force hidden when group is collapsed */
+.drawer-topic-group.collapsed .drawer-q-list {
+  display: none !important;
+}
+
 /* Continuous List (All 30 questions) */
 .drawer-full-list {
   display: flex;
